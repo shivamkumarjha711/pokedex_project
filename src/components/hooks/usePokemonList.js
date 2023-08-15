@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
 
-function usePokemonList(url, type) {
+function usePokemonList() {
 
     // const [pokemonList, setPokemonList] = useState([]);
     // const [isLoading, setIsLoading] = useState(true);
@@ -14,35 +14,26 @@ function usePokemonList(url, type) {
     const [pokemonListState, setPokemonListState] = useState({
         pokemonList: [],
         isLoading: true,
-        pokedexUrl: url,
+        pokedexUrl: 'https://pokeapi.co/api/v2/pokemon',
         nextUrl: '',
         prevUrl: ''
     })
 
     async function downloadPokemon() {
-        // setIsLoading(true);
-        setPokemonListState((state) => ({...state, isLoading: true}));
-        const response = await axios.get(pokemonListState.pokedexUrl);      // this downloads list of 20 poemon
 
-        const pokemonResults = response.data.results;       // we get the array of pokemon from result
+            setPokemonListState((state) => ({...state, isLoading: true}));
+            const response = await axios.get(pokemonListState.pokedexUrl);      // this downloads list of 20 poemon
 
-        console.log("response", response.data.pokemon);
-        console.log(response.data);
-        setPokemonListState((state) => ({
-            ...state, 
-            nextUrl: response.data.next, 
-            prevUrl: response.data.previous
-        }));
-        // setNextUrl(response.data.next);
-        // setPrevUrl(response.data.previous);
+            const pokemonResults = response.data.results;       // we get the array of pokemon from result
 
-        // iterating over the array of pokemons, and using their url, to create an array of promises that will download those 20 pokemons
-        if (type) {
+            console.log("response", response.data.pokemon);
+            console.log(response.data);
             setPokemonListState((state) => ({
-                ...state,
-                pokemonList: response.data.pokemon.slice(0, 5)
-            }))
-        } else {
+                ...state, 
+                nextUrl: response.data.next, 
+                prevUrl: response.data.previous
+            }));
+
             const pokemonResultPromise = pokemonResults.map((pokemon) => axios.get(pokemon.url));
 
             // passing that promise array to axios.all
@@ -67,7 +58,6 @@ function usePokemonList(url, type) {
             }));
             // setPokemonList(pokeListResult);
             // setIsLoading(false);
-        }
     }
 
     useEffect(() => {
